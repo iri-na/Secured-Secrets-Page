@@ -12,7 +12,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 app.use(session({
-    secret: "This is our little secret ;)",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false
 }));
