@@ -12,6 +12,11 @@ body {
     text-align: center;
 }
 
+.social-block {
+    background-color: #fddde6;
+    border: 0px;
+}
+
 .secret-text {
   text-align: center;
   font-size: 2rem;
