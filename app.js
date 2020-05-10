@@ -77,25 +77,24 @@ app.get("/register", function(req, res) {
 });
 
 app.post("/register", function(req, res) {
-    const email = req.body.email;
-    const username = req.body.username;
-    const password = req.body.password;
 
-    User.register({username: username}, password, function(err, user) {
-        if (err) {
-            console.log(err);
-            res.redirect("/register");
-        } else {
-            passport.authenticate("local")(req, res, function() {
-                bcrypt.hash(email, saltRounds, function(err, hash) {
-                    User.findOneAndUpdate({username: username}, {email: hash}, function(err) {
-                        if (!err) {
-                            res.redirect("/secrets");
-                        }
-                    });
+    bcrypt.hash(req.body.email, saltRounds, function(err, hash) {
+        const newUser = new User({
+            email: hash,
+            username: req.body.username,
+            password: req.body.password
+        });
+
+        User.register({username: newUser.username}, newUser.password, function(err, user) {
+            if (err) {
+                console.log(err);
+                res.redirect("/register");
+            } else {
+                passport.authenticate("local")(req, res, function() {
+                    res.redirect("/secrets");
                 });
-            });
-        }
+            }
+        });
     });
 
 });
