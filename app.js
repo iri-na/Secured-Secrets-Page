@@ -7,6 +7,8 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const app = express();
 
@@ -29,6 +31,7 @@ const secretSchema = new mongoose.Schema ({
 });
 
 const userSchema = new mongoose.Schema ({
+    username: String,
     email: String,
     password: String,
     googleId: String,
@@ -53,8 +56,8 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new GoogleStrategy({
-        clientID: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: "http://localhost:3000/auth/google/secrets",
         userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
     },
@@ -74,14 +77,23 @@ app.get("/register", function(req, res) {
 });
 
 app.post("/register", function(req, res) {
+    const email = req.body.email;
+    const username = req.body.username;
+    const password = req.body.password;
 
-    User.register({username: req.body.username}, req.body.password, function(err, user) {
+    User.register({username: username}, password, function(err, user) {
         if (err) {
             console.log(err);
             res.redirect("/register");
         } else {
             passport.authenticate("local")(req, res, function() {
-                res.redirect("/secrets");
+                bcrypt.hash(email, saltRounds, function(err, hash) {
+                    User.findOneAndUpdate({username: username}, {email: hash}, function(err) {
+                        if (!err) {
+                            res.redirect("/secrets");
+                        }
+                    });
+                });
             });
         }
     });
@@ -95,6 +107,7 @@ app.get("/login", function(req, res) {
 app.post("/login", function(req, res) {
 
     const newUser = new User({
+        email: req.body.email,
         username: req.body.username,
         password: req.body.password
     });
@@ -167,5 +180,5 @@ app.get("/logout", function(req, res) {
 });
 
 app.listen(3000, function() {
-    console.log("Server started on port 3000.");
+    console.log("Server running on port 3000.")
 });

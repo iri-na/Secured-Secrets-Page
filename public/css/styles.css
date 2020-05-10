@@ -12,9 +12,33 @@ body {
     text-align: center;
 }
 
-.social-block {
-    background-color: #fddde6;
-    border: 0px;
+.login-separator {
+    margin: .5rem 0;
+}
+
+.authentication-login-separator {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 4rem;
+    justify-content: center;
+}
+
+.span {
+    background-color: #dbd9d7;
+    flex-grow: 1;
+    height: .1rem;
+}
+.authentication-login-label {
+    background-color: #fff;
+    font-size: 1.4rem;
+    margin-top: -.1rem;
+    padding: 0 1rem;
+}
+
+.btn-social {
+    text-align: center;
+    padding-left: 0;
 }
 
 .secret-text {
